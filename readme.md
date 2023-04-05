@@ -17,7 +17,7 @@ Henry Schofield
 ## About The App
 
 [Currency Converter Website]
-The application is a website that will
+The application is a website that converts currency amount using rates pulled from the floar rate api.
 
 ## Technologies
 
