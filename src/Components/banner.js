@@ -3,9 +3,9 @@ import bannerImg from './img/banner.png';
 import './banner.css'
  
 /**
- * home page
+ * Banner page
  * 
- * defines what is to be placed on the home page 
+ * defines what is to be placed on the top of the page
  * 
  * @author Henry Schofiled
  */

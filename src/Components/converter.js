@@ -3,9 +3,21 @@ import './converter.css';
 
  
 /**
- * home page
+ * Converter page
  * 
- * defines what is to be placed on the home page 
+ * This is a React functional component called "ConverterPage" that allows users convert currencies based on the exchange rate.
+ * At the top of the component, it defines five states using the useState() hook from React:
+ * currencies: An empty array that will be used to store the available currencies.
+ * sourceCurrency: The default source currency is USD.
+ * targetCurrency: The default target currency is USD.
+ * amount: The default amount is 1.
+ * exchangeRate: An empty string that will be used to store the exchange rate.
+ * It then uses the useEffect() hook to fetch currency data from an API and populate the currencies state. The second useEffect() hook is used to fetch the exchange rate from the API based on the selected source and target currencies.
+ * The component also defines three functions to handle changes to the source currency, target currency, and amount.
+ * The convertCurrency() function calculates the conversion result based on the selected currencies and the amount entered by the user. If the user selects the same currency for both source and target, it will display an error message.
+*In the return statement, the component renders a form with three dropdown menus to select the source currency, target currency, and amount to convert. It also displays the conversion result in a paragraph element.
+*Overall, this component provides a simple and user-friendly way to convert currencies based on real-time exchange rates.
+
  * 
  * @author Henry Schofiled
  */
