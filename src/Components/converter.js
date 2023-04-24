@@ -1,27 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import './converter.css';
+import './converter.css'
 
- 
-/**
- * Converter page
- * 
- * This is a React functional component called "ConverterPage" that allows users convert currencies based on the exchange rate.
- * At the top of the component, it defines five states using the useState() hook from React:
- * currencies: An empty array that will be used to store the available currencies.
- * sourceCurrency: The default source currency is USD.
- * targetCurrency: The default target currency is USD.
- * amount: The default amount is 1.
- * exchangeRate: An empty string that will be used to store the exchange rate.
- * It then uses the useEffect() hook to fetch currency data from an API and populate the currencies state. The second useEffect() hook is used to fetch the exchange rate from the API based on the selected source and target currencies.
- * The component also defines three functions to handle changes to the source currency, target currency, and amount.
- * The convertCurrency() function calculates the conversion result based on the selected currencies and the amount entered by the user. If the user selects the same currency for both source and target, it will display an error message.
-*In the return statement, the component renders a form with three dropdown menus to select the source currency, target currency, and amount to convert. It also displays the conversion result in a paragraph element.
-*Overall, this component provides a simple and user-friendly way to convert currencies based on real-time exchange rates.
+/*
+This component displays a dropdown list of currency options to choose from. It takes currencies, label, value, and onChange as props. The currencies prop is an array of objects containing the code and name of each currency. The label prop is a string representing the label for the dropdown. The value prop is the currently selected currency code. The onChange prop is a callback function that is triggered when the user selects a new currency.
+*/
+function CurrencySelector({ currencies, label, value, onChange }) {
+  return (
+    <div>
+      <label className="CurrencyLable">{label}</label>
+      <select className="CurrencySelect" value={value} onChange={onChange}>
+        {currencies.map((currency) => (
+          <option key={currency.code} value={currency.code}>
+            {currency.name} ({currency.code})
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
- * 
- * @author Henry Schofiled
- */
+/*
+This component displays an input field to enter the amount to be converted. It takes value and onChange as props. The value prop is the current amount entered by the user. The onChange prop is a callback function that is triggered when the user enters a new amount.
+*/
+function AmountInput({ value, onChange }) {
+  return (
+    <div>
+      <label className="AmountLable">Amount:</label>
+      <input className="AmountInput" type="number" value={value} onChange={onChange} />
+    </div>
+  );
+}
 
+/*
+This component displays the result of the currency conversion. It takes sourceCurrency, targetCurrency, amount, and exchangeRate as props. The sourceCurrency and targetCurrency props are the currency codes for the source and target currencies. The amount prop is the amount entered by the user. The exchangeRate prop is the exchange rate for the selected currencies. If the source and target currencies are the same, it displays an error message asking the user to select different currencies.
+*/
+function ConverterResult({ sourceCurrency, targetCurrency, amount, exchangeRate }) {
+  if (sourceCurrency === targetCurrency) {
+    return <p className="Result">Please select two different currencies</p>;
+  } else {
+    const result = amount * exchangeRate;
+    return <p className="Result">Conversion Result: {result.toFixed(2)}</p>;
+  }
+}
+
+/*
+This is the main component that combines the above three components and fetches the currency exchange rates from the API. It initializes four states using useState hook: currencies, sourceCurrency, targetCurrency, amount, and exchangeRate. The useEffect hook is used to fetch the list of available currencies and exchange rates from the API when the component mounts and when the sourceCurrency and targetCurrency states change. It also defines three callback functions to handle changes in the source currency, target currency, and amount.
+*/
 function ConverterPage() {
   const [currencies, setCurrencies] = useState([]);
   const [sourceCurrency, setSourceCurrency] = useState('usd');
@@ -31,81 +55,55 @@ function ConverterPage() {
 
   useEffect(() => {
     fetch('http://www.floatrates.com/daily/tzs.json')
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         const availableCurrencies = Object.keys(data);
-        const currenciesList = availableCurrencies.map((currency) => {
-          return {
-            code: currency,
-            name: data[currency].name
-          };
-        });
+        const currenciesList = availableCurrencies.map((currency) => ({
+          code: currency,
+          name: data[currency].name,
+        }));
         setCurrencies(currenciesList);
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
   }, []);
 
   useEffect(() => {
     fetch(`http://www.floatrates.com/daily/${sourceCurrency.toLowerCase()}.json`)
-      .then(response => response.json())
-      .then(data => setExchangeRate(data[targetCurrency.toLowerCase()].rate))
-      .catch(error => console.log(error));
+      .then((response) => response.json())
+      .then((data) => setExchangeRate(data[targetCurrency.toLowerCase()].rate))
+      .catch((error) => console.log(error));
   }, [sourceCurrency, targetCurrency]);
 
   const handleSourceCurrencyChange = (event) => {
     setSourceCurrency(event.target.value);
-  }
+  };
 
   const handleTargetCurrencyChange = (event) => {
     setTargetCurrency(event.target.value);
-  }
+  };
 
   const handleAmountChange = (event) => {
     setAmount(event.target.value);
-  }
-
-  const convertCurrency = () => {
-    if(sourceCurrency == targetCurrency){
-      return ("please select two different currencies");
-    }
-    else{
-      const result = amount * exchangeRate;
-      return result.toFixed(2);
-    }
-  }
+  };
 
   return (
     <div>
-      <div>
-        <label className= "CurrencyLable">Source Currency:</label>
-        <select className= "CurrencySelect" value={sourceCurrency} onChange={handleSourceCurrencyChange}>
-          {currencies.map((currency) => (
-            <option key={currency.code} value={currency.code}>
-              {currency.name} ({currency.code})
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label className= "CurrencyLable">Target Currency:</label>
-        <select className= "CurrencySelect" value={targetCurrency} onChange={handleTargetCurrencyChange}>
-          {currencies.map((currency) => (
-            <option key={currency.code} value={currency.code}>
-              {currency.name} ({currency.code})
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label className= "AmountLable"> Amount:</label>
-        <input className= "AmountInput" type="number" value={amount} onChange={handleAmountChange} />
-      </div>
-      <div>
-        <p className= "Result">Conversion Result: {convertCurrency()}</p>
-      </div>
+      <CurrencySelector
+        currencies={currencies}
+        label="Source Currency:"
+        value={sourceCurrency}
+        onChange={handleSourceCurrencyChange}
+      />
+      <CurrencySelector
+        currencies={currencies}
+        label="Target Currency:"
+        value={targetCurrency}
+        onChange={handleTargetCurrencyChange}
+      />
+      <AmountInput value={amount} onChange={handleAmountChange} />
+      <ConverterResult sourceCurrency={sourceCurrency} targetCurrency={targetCurrency} amount={amount} exchangeRate={exchangeRate} />
     </div>
   );
 }
 
- 
 export default ConverterPage;
